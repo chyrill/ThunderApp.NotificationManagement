@@ -8,7 +8,7 @@ import NotificationTemplate from '../notificationtemplate/notificationtemplate.m
 export async function create(req, res) {
     var result = new Result();
     try {
-        var authenticationRes = await Authorization(req.headers,authorization);
+        var authenticationRes = await Authorization(req.headers.authorization);
         
         if (authenticationRes.successful != true) {
             result.successful = false;
@@ -30,6 +30,7 @@ export async function create(req, res) {
         return res.status(200).json(result);
     }
     catch (e) {
+        console.log(e);
         result.successful = false; 
         result.model = req.body;
         result.message = e.errmsg;
@@ -42,7 +43,7 @@ export async function searchAll(req, res) {
     var result = new SearchResult();
     
     try {
-        var authenticationRes = await Authorization(req.headers,authorization);
+        var authenticationRes = await Authorization(req.headers.authorization);
                         
         if (authenticationRes.successful != true) {
             result.successful = false;
@@ -80,7 +81,7 @@ export async function update(req, res) {
     var result = new Result();
     
     try {
-        var authenticationRes = await Authorization(req.headers,authorization);
+        var authenticationRes = await Authorization(req.headers.authorization);
                         
         if (authenticationRes.successful != true) {
             result.successful = false;
@@ -114,7 +115,7 @@ export async function getById(req, res) {
     var result = new Result();
     
     try {
-        var authenticationRes = await Authorization(req.headers,authorization);
+        var authenticationRes = await Authorization(req.headers.authorization);
                         
         if (authenticationRes.successful != true) {
             result.successful = false;
@@ -165,7 +166,7 @@ export async function remove(req, res) {
     var result = new Result();
     
     try {
-        var authenticationRes = await Authorization(req.headers,authorization);
+        var authenticationRes = await Authorization(req.headers.authorization);
                         
         if (authenticationRes.successful != true) {
             result.successful = false;
@@ -188,7 +189,7 @@ export async function remove(req, res) {
             return res.status(400).json(result);
         }
         
-        if (ifMessageTemplateUsed(id)) {
+        if (await ifMessageTemplateUsed(id)) {
             result.successful =  false;
             result.model = null;
             result.message = 'Message Template is currently in used';
@@ -217,7 +218,7 @@ export async function search(req, res) {
     var result = new SearchResult();
     
     try {
-        var authenticationRes = await Authorization(req.headers,authorization);
+        var authenticationRes = await Authorization(req.headers.authorization);
                         
         if (authenticationRes.successful != true) {
             result.successful = false;
@@ -267,7 +268,7 @@ export async function search(req, res) {
     }
 }
 
-function ifMessageTemplateUsed(id) {
+async function ifMessageTemplateUsed(id) {
     var searchItems = await NotificationTemplate.find({ MessageTemplateId: id})
     
     if (searchItems.length > 0)

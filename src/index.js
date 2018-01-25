@@ -3,11 +3,15 @@ import constants from './config/constants';
 import './config/database';
 import middlewaresConfig from './config/middlewares';
 import ProcessorService from './services/processorService';
+import SenderService from './services/senderService';
+import ApiRoutes from './modules';
 
 
 const app = express();
 
 middlewaresConfig(app);
+
+ApiRoutes(app);
 
 app.listen(constants.PORT, err =>{
   if(err){
@@ -22,5 +26,6 @@ app.listen(constants.PORT, err =>{
       `);
       
       ProcessorService();
+      SenderService();
   }
 });

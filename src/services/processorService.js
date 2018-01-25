@@ -1,6 +1,8 @@
 import Notification from '../modules/notification/notification.model';
 import MessageTemplate from '../modules/messagetemplate/messagetemplate.model';
 import NotificationTemplate from '../modules/notificationtemplate/notificationtemplate.model';
+import Recipient from '../modules/recipient/recipient.model';
+import Queue from '../modules/queue/queue.model';
 
 export default function ProcessorService() {
     
@@ -13,8 +15,8 @@ export default function ProcessorService() {
     try {
         setInterval(
             function () {
-                
-            }, 30000
+                 Processor();
+            }, 1000
         );
     }
     catch (e) {
@@ -23,13 +25,13 @@ export default function ProcessorService() {
 }
 
 async function Processor() {
-    
+   
     var notificationItems = await Notification.find({ Status: 'New' });
     
     for (let notification in notificationItems) {
-        
+      
         var item = notificationItems[notification];
-        
+      
         var queue = {
             Context: item.Context,
             Email: '',
@@ -41,11 +43,30 @@ async function Processor() {
             Status: 'New'
         };
         
-        var notificationTemplateRes  = await Notification.findOne({ _id: item.NotificationTemplateId });
+        var notificationTemplateRes  = await NotificationTemplate.findOne({ _id: item.NotificationTemplateId });
+       
+        queue.NotificationTemplateId = notificationTemplateRes._id;
         
         var messageTemplateRes = await MessageTemplate.findOne({ _id: notificationTemplateRes.MessageTemplateId });
         
-        var message = ParseText(messageTemplateRes.Message, item.Payload);
+        
+        queue.Message = parseMessage(messageTemplateRes.Message, item.Payload);
+        
+        queue.Subject = parseMessage(messageTemplateRes.Subject, item.Payload);
+        
+        var recipientRes =  await Recipient.findOne({ _id: item.RecipientId });
+       
+        
+        queue.Email = recipientRes.Email;
+        queue.PhoneNumber = recipientRes.PhoneNumber;
+     
+        var createRes =  await Queue.create(queue);
+        
+        
+        item.Status = 'Parsed';
+        
+        var updateNotif = await Notification.findOneAndUpdate({ _id: item._id }, item, { Upsert: true, strict: false });
+     
     }
 }
 
@@ -81,35 +102,37 @@ function parseTable(message, payload) {
     
     do {
         if (text.indexOf('[{Loop}]') < 0) {
+               
             break;
         }
         else {
             var replacementTable = text.substring(text.indexOf('[{Loop}]'), text.indexOf('[{/Loop}]') + 9);
+    
             var tableText = text.substring(text.indexOf('[{Loop}]') + 8, text.indexOf('[{/Loop}]'));
-    
+            
             var tableReplacementTags = getListOfReplacement(tableText);
-    
+           
             var propName = '';
     
             for (let item in tableReplacementTags) {
-                propName = getArrayPropertyName(item);
-        
+                propName = getArrayPropertyName(tableReplacementTags[item]);
+                
                 if (propName !== null || propName !== undefined) {
                     break;
                 }
             }
-            
+          
             for (let item in payload[propName]) {
                 finalTable += replaceTags(tableText, payload, tableReplacementTags, item);
             }
             
-            text.replace(replacementTable, finalTable);
+            text = text.replace(replacementTable, finalTable);
             finalTable = '';
         }
     }
     
     while (hasTableToReplace)
-    
+
     return text;
 }
 
@@ -123,25 +146,27 @@ function getArrayPropertyName(replacementTag) {
 }
 
 function replaceTags(message, payload, replacementTags, index) {
-    
+   
     for (let item in replacementTags ) {
-        if (replacementTags[item].substring('.') >= 0 && index >= 0) {
+        
+        if (replacementTags[item].indexOf('.') >= 0 && index >= 0) {
+            
             var propName = replacementTags[item].split('.')[0].replace('{{', '');
             var propValue = replacementTags[item].split('.')[1].replace('}}', '');
             var data = payload[propName][index][propValue];
-            
             message = message.replace(replacementTags[item], data);
         }
-        else if (replacementTags[item].substring('.') >= 0 && index < 0) {
+        else if (replacementTags[item].indexOf('.') > 0 && index < 0) {
             var propName = replacementTags[item].split('.')[0].replace('{{', '');
             var propValue = replacementTags[item].split('.')[1].replace('}}', '');
             var data = payload[propName][propValue];
             
             message = message.replace(replacementTags[item], data);
         }
-        else if (replacementTags[item].substring('.') < 0) {
+        else if (replacementTags[item].indexOf('.') < 0) {
             var data = payload[replacementTags[item].replace('{{', '').replace('}}', '')];
             message = message.replace(replacementTags[item], data);
+            console.log(message);
         }
     }
     
@@ -149,5 +174,17 @@ function replaceTags(message, payload, replacementTags, index) {
 }
 
 function parseMessage(message, payload) {
-    if ()
+    var text = message;
+ 
+    if (message.indexOf('[{Loop}]') >= 0) {
+        text = parseTable(message, payload);
+        var replacementTags = getListOfReplacement(text);
+        text = replaceTags(text, payload, replacementTags, -1);
+    }
+    else {
+        var replacementTags = getListOfReplacement(message);
+        text = replaceTags(text, payload, replacementTags, -1);
+    }
+    
+    return text;
 }

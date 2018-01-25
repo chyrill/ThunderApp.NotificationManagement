@@ -9,7 +9,7 @@ export async function create(req, res) {
     var result = new Result();
     
     try {
-        var authenticationRes = await Authorization(req.headers,authorization);
+        var authenticationRes = await Authorization(req.headers.authorization);
                         
         if (authenticationRes.successful != true) {
             result.successful = false;
@@ -22,7 +22,7 @@ export async function create(req, res) {
             req.body.CreatedBy = authenticationRes.model.Name;
         }
         
-        if (!ifMessageTemplateExisted(req.body.MessageTemplateId)) {
+        if (!await ifMessageTemplateExisted(req.body.MessageTemplateId)) {
             result.successful =  false;
             result.model = req.body;
             result.message = 'Message Template does not exist';
@@ -51,7 +51,7 @@ export async function update(req, res) {
     var result = new Result();
     
     try {
-        var authenticationRes = await Authorization(req.headers,authorization);
+        var authenticationRes = await Authorization(req.headers.authorization);
                         
         if (authenticationRes.successful != true) {
             result.successful = false;
@@ -64,7 +64,7 @@ export async function update(req, res) {
             req.body.DateUpdated = new Date();
         }
         
-        if (!ifMessageTemplateExisted(req.body.MessageTemplateId)) {
+        if (!await ifMessageTemplateExisted(req.body.MessageTemplateId)) {
             result.successful = false;
             result.model = req.body;
             result.message = 'Message Template does not exist';
@@ -93,7 +93,7 @@ export async function getById(req, res) {
     var result = new Result();
     
     try {
-        var authenticationRes = await Authorization(req.headers,authorization);
+        var authenticationRes = await Authorization(req.headers.authorization);
                         
         if (authenticationRes.successful != true) {
             result.successful = false;
@@ -146,7 +146,7 @@ export async function remove(req, res) {
     var result = new Result();
     
     try {
-        var authenticationRes = await Authorization(req.headers,authorization);
+        var authenticationRes = await Authorization(req.headers.authorization);
                         
         if (authenticationRes.successful != true) {
             result.successful = false;
@@ -190,7 +190,7 @@ export async function searchAll(req, res) {
     var result = new SearchResult();
     
     try {
-        var authenticationRes = await Authorization(req.headers,authorization);
+        var authenticationRes = await Authorization(req.headers.authorization);
                         
         if (authenticationRes.successful != true) {
             result.successful = false;
@@ -228,7 +228,7 @@ export async function search(req, res) {
     var result = new SearchResult();
     
     try {
-        var authenticationRes = await Authorization(req.headers,authorization);
+        var authenticationRes = await Authorization(req.headers.authorization);
                         
         if (authenticationRes.successful != true) {
             result.successful = false;
@@ -278,7 +278,7 @@ export async function search(req, res) {
     }
 }
 
-function ifMessageTemplateExisted(id) {
+async function ifMessageTemplateExisted(id) {
     var messageTemplate = await MessageTemplate.findOne({ _id: id});
     
     if (messageTemplate !== null)

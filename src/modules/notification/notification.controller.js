@@ -10,7 +10,7 @@ export async function sendSimple(req, res) {
     var result = new Result();
     
     try {
-        var authenticationRes = await Authorization(req.headers,authorization);
+        var authenticationRes = await Authorization(req.headers.authorization);
         
         var recipientIds = [];
         var payload = [];
@@ -25,9 +25,10 @@ export async function sendSimple(req, res) {
             req.body.CreatedBy = authenticationRes.model.Name;
         }
         
-        var checkRecipient = checkIfValidRecipient(req.body.RecipientId);
+        var checkRecipient = await checkIfValidRecipient(req.body.RecipientId);
         
         if (!checkRecipient.successful) {
+            
             result.successful = false;
             result.model = checkRecipient.model;
             result.message = checkRecipient.message;
@@ -35,9 +36,9 @@ export async function sendSimple(req, res) {
             return res.status(400).json(result);
         }
         
-        var checkNotificationTemplate = checkIfValidNotificationTemplate(req.body.NotificationTemplateId);
+        var checkNotificationTemplate = await checkIfValidNotificationTemplate(req.body.NotificationTemplateId);
         
-        if (!checkIfValidNotificationTemplate.successful) {
+        if (!checkNotificationTemplate.successful) {
             result.successful = false;
             result.model = checkIfValidNotificationTemplate.model;
             result.message = checkIfValidNotificationTemplate.message;
@@ -69,7 +70,7 @@ export async function sendSimpleBulk(req, res) {
     var result = new Result();
     
     try {
-        var authenticationRes = await Authorization(req.headers,authorization);
+        var authenticationRes = await Authorization(req.headers.authorization);
                         
         if (authenticationRes.successful != true) {
             result.successful = false;
@@ -82,7 +83,7 @@ export async function sendSimpleBulk(req, res) {
             req.body.CreatedBy = authenticationRes.model.Name;
         }
         
-        var checkNotificationTemplate = checkIfValidNotificationTemplate(req.body.NotificationTemplateId);
+        var checkNotificationTemplate = await checkIfValidNotificationTemplate(req.body.NotificationTemplateId);
         
         if (!checkIfValidNotificationTemplate.successful) {
             result.successful = false;
@@ -94,7 +95,7 @@ export async function sendSimpleBulk(req, res) {
         
         for (let recipient in req.body.RecipientIds) {
             
-            var checkRecipient = checkIfValidRecipient(req.body.RecipientId[recipient]);
+            var checkRecipient = await checkIfValidRecipient(req.body.RecipientId[recipient]);
             
             if (!checkRecipient.successful) {
                 result.successful = false;
@@ -139,7 +140,7 @@ export async function sendPairMessage(req, res) {
     var result = new Result();
     
     try {
-        var authenticationRes = await Authorization(req.headers,authorization);
+        var authenticationRes = await Authorization(req.headers.authorization);
                         
         if (authenticationRes.successful != true) {
             result.successful = false;
@@ -152,7 +153,7 @@ export async function sendPairMessage(req, res) {
             req.body.CreatedBy = authenticationRes.model.Name;
         }
         
-         var checkNotificationTemplate = checkIfValidNotificationTemplate(req.body.NotificationTemplateId);
+         var checkNotificationTemplate = await checkIfValidNotificationTemplate(req.body.NotificationTemplateId);
         
         if (!checkIfValidNotificationTemplate.successful) {
             result.successful = false;
@@ -171,7 +172,7 @@ export async function sendPairMessage(req, res) {
         };
         
         for (let pairRecipientPayload in req.body.PairPayload) {
-            var checkRecipient = checkIfValidRecipient(req.body.PairPayload[pairRecipientPayload].RecipientId);
+            var checkRecipient = await checkIfValidRecipient(req.body.PairPayload[pairRecipientPayload].RecipientId);
             
             if (!checkRecipient.successful) {
                 result.successful = false;
@@ -205,7 +206,7 @@ export async function sendPairMessage(req, res) {
     }
 }
 
-function checkIfValidRecipient(id) {
+async function checkIfValidRecipient(id) {
     var result = new Result();
     
     try {
@@ -234,7 +235,7 @@ function checkIfValidRecipient(id) {
     }
 }
 
-function checkIfValidNotificationTemplate(id) {
+async function checkIfValidNotificationTemplate(id) {
     var result = new Result();
     
     try {

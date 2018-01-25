@@ -27,7 +27,7 @@ const QueueSchema = new Schema ({
         type: Date
     },
     Tries: {
-        type: {}
+        type: Number
     }
 });
 

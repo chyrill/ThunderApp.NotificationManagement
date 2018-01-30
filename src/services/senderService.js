@@ -60,6 +60,7 @@ async function Process() {
                         do {
                             transporter.sendMail(mailOptions, (error, info) => {
                                if (error) {
+                                   console.log(error);
                                    queueItems[queueIndex]['Tries'] += 1;
                                    counter ++;
                                    if (counter === 3) {
@@ -67,11 +68,14 @@ async function Process() {
                                    }
                                } 
                                 else {
+                                    console.log(info);
                                     queueItems[queueIndex]['Tries'] += 1;
                                     queueItems[queueIndex].Status = 'Sent';
                                     counter = 4;
                                 }
                             });
+                            
+                            transporter.quit();
                         }
                         while (counter < 3);
                         

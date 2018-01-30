@@ -8,18 +8,6 @@ export async function create(req, res) {
     var result = new Result();
     
     try {
-        var authenticationRes = await Authorization(req.headers.authorization);
-                        
-        if (authenticationRes.successful != true) {
-            result.successful = false;
-            result.model = req.body;
-            result.message = authenticationRes.message;
-            return res.status(401).json(result);
-        }
-        else {
-            req.body.Context = authenticationRes.model.Context;
-            req.body.CreatedBy = authenticationRes.model.Name;
-        }
         
         var createRes = await Recipient.create(req.body);
         

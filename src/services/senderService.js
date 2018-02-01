@@ -4,6 +4,7 @@ import NotificationTemplate from '../modules/notificationtemplate/notificationte
 import Queue from '../modules/queue/queue.model';
 import smtpTransport from 'nodemailer-smtp-transport';
 import email from 'emailjs';
+import decode from 'unescape'
 
 export default function SenderService () {
     console.log(`
@@ -51,7 +52,7 @@ async function Process() {
                             to: queueItems[queueIndex].Email,
                             subject: queueItems[queueIndex].Subject,
                             attachment: [
-                                {data: messageTemplateRes.ContentType === 'html' ? queueItems[queueIndex].Message: '', alternative: true}
+                                {data: messageTemplateRes.ContentType === 'html' ? decode(queueItems[queueIndex].Message): '', alternative: true}
                             ]
                         };
                         console.log(message)

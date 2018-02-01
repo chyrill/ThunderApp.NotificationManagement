@@ -740,6 +740,18 @@ var _queue = __webpack_require__(12);
 
 var _queue2 = _interopRequireDefault(_queue);
 
+var _fs = __webpack_require__(34);
+
+var _fs2 = _interopRequireDefault(_fs);
+
+var _createHtml = __webpack_require__(35);
+
+var _createHtml2 = _interopRequireDefault(_createHtml);
+
+var _unescape = __webpack_require__(36);
+
+var _unescape2 = _interopRequireDefault(_unescape);
+
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
 function ProcessorService() {
@@ -785,11 +797,21 @@ async function Processor() {
         var messageTemplateRes = await _messagetemplate2.default.findOne({ _id: notificationTemplateRes.MessageTemplateId });
 
         queue.Message = parseMessage(messageTemplateRes.Message, item.Payload);
-        console.log(queue.Message);
+        console.log((0, _unescape2.default)(queue.Message));
         queue.Subject = parseMessage(messageTemplateRes.Subject, item.Payload);
 
         var recipientRes = await _recipient2.default.findOne({ _id: item.RecipientId });
 
+        if (messageTemplateRes.ContentType === 'html') {
+            var html = (0, _createHtml2.default)({
+                body: queue.Message
+            });
+            _fs2.default.writeFile('email.html', queue.Message, err => {
+                if (err) {
+                    console.log(err);
+                }
+            });
+        }
         queue.Email = recipientRes.Email;
         queue.PhoneNumber = recipientRes.PhoneNumber;
 
@@ -945,6 +967,10 @@ var _emailjs = __webpack_require__(24);
 
 var _emailjs2 = _interopRequireDefault(_emailjs);
 
+var _unescape = __webpack_require__(36);
+
+var _unescape2 = _interopRequireDefault(_unescape);
+
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
 function SenderService() {
@@ -987,7 +1013,7 @@ async function Process() {
                             from: notificationTemplateRes.Sender,
                             to: queueItems[queueIndex].Email,
                             subject: queueItems[queueIndex].Subject,
-                            attachment: [{ data: messageTemplateRes.ContentType === 'html' ? queueItems[queueIndex].Message : '', alternative: true }]
+                            attachment: [{ data: messageTemplateRes.ContentType === 'html' ? (0, _unescape2.default)(queueItems[queueIndex].Message) : '', alternative: true }]
                         };
                         console.log(message);
                         var status = '';
@@ -2339,6 +2365,236 @@ async function checkIfValidNotificationTemplate(id) {
         return result;
     }
 }
+
+/***/ }),
+/* 34 */
+/***/ (function(module, exports) {
+
+module.exports = require("fs");
+
+/***/ }),
+/* 35 */
+/***/ (function(module, exports) {
+
+function buildStylesheets (sheets, async) {
+  var output = ''
+  if (!sheets) return output
+
+  if (typeof sheets === 'string') {
+    sheets = [sheets]
+  }
+
+  sheets.forEach(function (sheet) {
+    output += !async
+      ? `<link rel="stylesheet" href="${sheet}">\n`
+      : `<link rel="stylesheet" href="${sheet}" media="none" onload="if(media!=='all')media='all'">\n`
+  })
+
+  return output
+}
+
+function buildScripts (scripts, async) {
+  var output = ''
+  if (!scripts) return output
+
+  if (typeof scripts === 'string') {
+    scripts = [scripts]
+  }
+
+  scripts.forEach(function (script) {
+    output += !async
+      ? `<script src="${script}"></script>\n`
+      : `<script src="${script}" async></script>\n`
+  })
+
+  return output
+}
+
+module.exports = function (opts) {
+  var title = opts.title ? `<title>${opts.title}</title>` : ''
+  var headScript = (opts.script && opts.scriptAsync) ? buildScripts(opts.script, opts.scriptAsync) : ''
+  var bodyScript = (opts.script && !opts.scriptAsync) ? buildScripts(opts.script, opts.scriptAsync) : ''
+  var favicon = opts.favicon ? `<link rel="icon" href="${opts.favicon}">` : ''
+  var css = buildStylesheets(opts.css, opts.cssAsync)
+  var lang = opts.lang || 'en'
+  var dir = opts.dir || 'ltr'
+  var head = opts.head || ''
+  var body = opts.body || ''
+
+  return `<!doctype html>
+<html lang="${lang}" dir="${dir}">
+<head>
+${title}
+<meta charset="utf-8">
+${favicon}
+${head}
+${css}
+${headScript}
+</head>
+<body>
+${body}
+${bodyScript}
+</body>
+</html>
+`
+}
+
+
+/***/ }),
+/* 36 */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+
+var extend = __webpack_require__(37);
+var regexCache = {};
+var all;
+
+var charSets = {
+  default: {
+    '&quot;': '"',
+    '&#34;': '"',
+
+    '&apos;': '\'',
+    '&#39;': '\'',
+
+    '&amp;': '&',
+    '&#38;': '&',
+
+    '&gt;': '>',
+    '&#62;': '>',
+
+    '&lt;': '<',
+    '&#60;': '<'
+  },
+  extras: {
+    '&cent;': '¢',
+    '&#162;': '¢',
+
+    '&copy;': '©',
+    '&#169;': '©',
+
+    '&euro;': '€',
+    '&#8364;': '€',
+
+    '&pound;': '£',
+    '&#163;': '£',
+
+    '&reg;': '®',
+    '&#174;': '®',
+
+    '&yen;': '¥',
+    '&#165;': '¥'
+  }
+};
+
+// don't merge char sets unless "all" is explicitly called
+Object.defineProperty(charSets, 'all', {
+  get: function() {
+    return all || (all = extend({}, charSets.default, charSets.extras));
+  }
+});
+
+/**
+ * Convert HTML entities to HTML characters.
+ *
+ * @param  {String} `str` String with HTML entities to un-escape.
+ * @return {String}
+ */
+
+function unescape(str, type) {
+  if (!isString(str)) return '';
+  var chars = charSets[type || 'default'];
+  var regex = toRegex(type, chars);
+  return str.replace(regex, function(m) {
+    return chars[m];
+  });
+}
+
+function toRegex(type, chars) {
+  if (regexCache[type]) {
+    return regexCache[type];
+  }
+  var keys = Object.keys(chars).join('|');
+  var regex = new RegExp('(?=(' + keys + '))\\1', 'g');
+  regexCache[type] = regex;
+  return regex;
+}
+
+/**
+ * Returns true if str is a non-empty string
+ */
+
+function isString(str) {
+  return str && typeof str === 'string';
+}
+
+/**
+ * Expose charSets
+ */
+
+unescape.chars = charSets.default;
+unescape.extras = charSets.extras;
+// don't trip the "charSets" getter unless it's explicitly called
+Object.defineProperty(unescape, 'all', {
+  get: function() {
+    return charSets.all;
+  }
+});
+
+/**
+ * Expose `unescape`
+ */
+
+module.exports = unescape;
+
+
+/***/ }),
+/* 37 */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+
+var isObject = __webpack_require__(38);
+
+module.exports = function extend(o/*, objects*/) {
+  if (!isObject(o)) { o = {}; }
+
+  var len = arguments.length;
+  for (var i = 1; i < len; i++) {
+    var obj = arguments[i];
+
+    if (isObject(obj)) {
+      assign(o, obj);
+    }
+  }
+  return o;
+};
+
+function assign(a, b) {
+  for (var key in b) {
+    if (hasOwn(b, key)) {
+      a[key] = b[key];
+    }
+  }
+}
+
+/**
+ * Returns true if the given `key` is an own property of `obj`.
+ */
+
+function hasOwn(obj, key) {
+  return Object.prototype.hasOwnProperty.call(obj, key);
+}
+
+
+/***/ }),
+/* 38 */
+/***/ (function(module, exports) {
+
+module.exports = require("is-extendable");
 
 /***/ })
 /******/ ]);

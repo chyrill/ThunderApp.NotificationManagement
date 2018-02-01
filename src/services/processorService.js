@@ -3,6 +3,9 @@ import MessageTemplate from '../modules/messagetemplate/messagetemplate.model';
 import NotificationTemplate from '../modules/notificationtemplate/notificationtemplate.model';
 import Recipient from '../modules/recipient/recipient.model';
 import Queue from '../modules/queue/queue.model';
+import fs from 'fs';
+import createHTML from 'create-html';
+import decode from 'unescape';
 
 export default function ProcessorService() {
     
@@ -50,13 +53,23 @@ async function Processor() {
         var messageTemplateRes = await MessageTemplate.findOne({ _id: notificationTemplateRes.MessageTemplateId });
         
         
+        
         queue.Message = parseMessage(messageTemplateRes.Message, item.Payload);
-        console.log(queue.Message)
+        console.log(decode(queue.Message))
         queue.Subject = parseMessage(messageTemplateRes.Subject, item.Payload);
         
         var recipientRes =  await Recipient.findOne({ _id: item.RecipientId });
        
-        
+        if (messageTemplateRes.ContentType === 'html') {
+            var html = createHTML({
+                body: queue.Message
+            })
+            fs.writeFile('email.html', queue.Message, err => {
+                if (err) {
+                    console.log(err)
+                }
+            });
+        }
         queue.Email = recipientRes.Email;
         queue.PhoneNumber = recipientRes.PhoneNumber;
      

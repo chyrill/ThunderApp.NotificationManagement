@@ -9,20 +9,8 @@ export async function create(req, res) {
     var result = new Result();
     
     try {
+        var createRes = await Recipient.create(req.body)
         
-        var createRes = await Recipient.create(req.body);
-        axios({
-            method: 'post',
-            url: 'http://localhost:3000/api/v1/userInfo/setcontactid',
-            data: {
-                UserId: req.body.UserId,
-                ContactId: createRes._id
-            }
-        })
-            .then (response => {
-            })
-            .catch (err => {
-            })
         result.successful = true;
         result.model = createRes;
         result.message = 'Successfully added record';

@@ -51,7 +51,7 @@ async function Processor() {
         
         
         queue.Message = parseMessage(messageTemplateRes.Message, item.Payload);
-        
+        console.log(queue.Message)
         queue.Subject = parseMessage(messageTemplateRes.Subject, item.Payload);
         
         var recipientRes =  await Recipient.findOne({ _id: item.RecipientId });
@@ -102,21 +102,22 @@ function parseTable(message, payload) {
     
     do {
         if (text.indexOf('[{Loop}]') < 0) {
-               
+           
             break;
         }
         else {
+             
             var replacementTable = text.substring(text.indexOf('[{Loop}]'), text.indexOf('[{/Loop}]') + 9);
-    
+          
             var tableText = text.substring(text.indexOf('[{Loop}]') + 8, text.indexOf('[{/Loop}]'));
-            
+              
             var tableReplacementTags = getListOfReplacement(tableText);
-           
+          
             var propName = '';
     
             for (let item in tableReplacementTags) {
                 propName = getArrayPropertyName(tableReplacementTags[item]);
-                
+               
                 if (propName !== null || propName !== undefined) {
                     break;
                 }
@@ -132,7 +133,6 @@ function parseTable(message, payload) {
     }
     
     while (hasTableToReplace)
-
     return text;
 }
 
@@ -148,13 +148,14 @@ function getArrayPropertyName(replacementTag) {
 function replaceTags(message, payload, replacementTags, index) {
    
     for (let item in replacementTags ) {
-        
         if (replacementTags[item].indexOf('.') >= 0 && index >= 0) {
-            
+          
             var propName = replacementTags[item].split('.')[0].replace('{{', '');
             var propValue = replacementTags[item].split('.')[1].replace('}}', '');
             var data = payload[propName][index][propValue];
+            
             message = message.replace(replacementTags[item], data);
+          
         }
         else if (replacementTags[item].indexOf('.') > 0 && index < 0) {
             var propName = replacementTags[item].split('.')[0].replace('{{', '');
@@ -166,25 +167,26 @@ function replaceTags(message, payload, replacementTags, index) {
         else if (replacementTags[item].indexOf('.') < 0) {
             var data = payload[replacementTags[item].replace('{{', '').replace('}}', '')];
             message = message.replace(replacementTags[item], data);
-            console.log(message);
         }
     }
-    
+
     return message;
 }
 
 function parseMessage(message, payload) {
     var text = message;
- 
+    
     if (message.indexOf('[{Loop}]') >= 0) {
         text = parseTable(message, payload);
         var replacementTags = getListOfReplacement(text);
         text = replaceTags(text, payload, replacementTags, -1);
+         return text;
     }
     else {
         var replacementTags = getListOfReplacement(message);
         text = replaceTags(text, payload, replacementTags, -1);
+        return text;
     }
     
-    return text;
+   
 }

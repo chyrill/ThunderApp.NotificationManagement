@@ -3,6 +3,7 @@ import { Authorization } from '../../helpers/Authorization';
 import Result from '../../helpers/Result';
 import SearchResult from '../../helpers/SearchResult';
 import { QueryFilters } from '../../helpers/QueryFilters';
+import axios from 'axios';
 
 export async function create(req, res) {
     var result = new Result();
@@ -10,7 +11,18 @@ export async function create(req, res) {
     try {
         
         var createRes = await Recipient.create(req.body);
-        
+        axios({
+            method: 'post',
+            url: 'http://localhost:3000/api/v1/userInfo/setcontactid',
+            data: {
+                UserId: req.body.UserId,
+                ContactId: createRes._id
+            }
+        })
+            .then (response => {
+            })
+            .catch (err => {
+            })
         result.successful = true;
         result.model = createRes;
         result.message = 'Successfully added record';
@@ -18,6 +30,7 @@ export async function create(req, res) {
         return res.status(200).json(result);
     }
     catch (e) {
+        console.log(e)
         result.successful = false;
         result.model = req.body;
         result.message = e.errmsg;

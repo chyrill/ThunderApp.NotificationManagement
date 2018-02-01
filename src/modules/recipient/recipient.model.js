@@ -2,6 +2,9 @@ import mongoose, { Schema } from 'mongoose';
 import validator from 'validator';
 
 const RecipientSchema = new Schema ({
+    UserId: {
+        type: String
+    },
     Name: {
         type: String,
         required: [true, 'Name is required'],

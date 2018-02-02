@@ -52,29 +52,17 @@ async function Processor() {
         
         var messageTemplateRes = await MessageTemplate.findOne({ _id: notificationTemplateRes.MessageTemplateId });
         
-        
-        
         queue.Message = parseMessage(messageTemplateRes.Message, item.Payload);
-        console.log(decode(queue.Message))
+       
         queue.Subject = parseMessage(messageTemplateRes.Subject, item.Payload);
         
         var recipientRes =  await Recipient.findOne({ _id: item.RecipientId });
        
-        if (messageTemplateRes.ContentType === 'html') {
-            var html = createHTML({
-                body: queue.Message
-            })
-            fs.writeFile('email.html', queue.Message, err => {
-                if (err) {
-                    console.log(err)
-                }
-            });
-        }
+       
         queue.Email = recipientRes.Email;
         queue.PhoneNumber = recipientRes.PhoneNumber;
-     
-        var createRes =  await Queue.create(queue);
         
+        var createRes =  await Queue.create(queue);
         
         item.Status = 'Parsed';
         
@@ -125,17 +113,17 @@ function parseTable(message, payload) {
             var tableText = text.substring(text.indexOf('[{Loop}]') + 8, text.indexOf('[{/Loop}]'));
               
             var tableReplacementTags = getListOfReplacement(tableText);
-          
+
             var propName = '';
     
             for (let item in tableReplacementTags) {
                 propName = getArrayPropertyName(tableReplacementTags[item]);
-               
+                
                 if (propName !== null || propName !== undefined) {
                     break;
                 }
             }
-          
+            
             for (let item in payload[propName]) {
                 finalTable += replaceTags(tableText, payload, tableReplacementTags, item);
             }
@@ -150,10 +138,12 @@ function parseTable(message, payload) {
 }
 
 function getArrayPropertyName(replacementTag) {
+    
     if (replacementTag.indexOf('.') < 0) {
         return null;
     }
     else {
+        
         return replacementTag.split('.')[0].replace('{{','');
     }
 }
@@ -166,7 +156,7 @@ function replaceTags(message, payload, replacementTags, index) {
             var propName = replacementTags[item].split('.')[0].replace('{{', '');
             var propValue = replacementTags[item].split('.')[1].replace('}}', '');
             var data = payload[propName][index][propValue];
-            
+          
             message = message.replace(replacementTags[item], data);
           
         }
@@ -177,7 +167,7 @@ function replaceTags(message, payload, replacementTags, index) {
             
             message = message.replace(replacementTags[item], data);
         }
-        else if (replacementTags[item].indexOf('.') < 0) {
+        else {
             var data = payload[replacementTags[item].replace('{{', '').replace('}}', '')];
             message = message.replace(replacementTags[item], data);
         }

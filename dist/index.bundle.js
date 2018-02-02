@@ -797,21 +797,11 @@ async function Processor() {
         var messageTemplateRes = await _messagetemplate2.default.findOne({ _id: notificationTemplateRes.MessageTemplateId });
 
         queue.Message = parseMessage(messageTemplateRes.Message, item.Payload);
-        console.log((0, _unescape2.default)(queue.Message));
+
         queue.Subject = parseMessage(messageTemplateRes.Subject, item.Payload);
 
         var recipientRes = await _recipient2.default.findOne({ _id: item.RecipientId });
 
-        if (messageTemplateRes.ContentType === 'html') {
-            var html = (0, _createHtml2.default)({
-                body: queue.Message
-            });
-            _fs2.default.writeFile('email.html', queue.Message, err => {
-                if (err) {
-                    console.log(err);
-                }
-            });
-        }
         queue.Email = recipientRes.Email;
         queue.PhoneNumber = recipientRes.PhoneNumber;
 
@@ -884,9 +874,11 @@ function parseTable(message, payload) {
 }
 
 function getArrayPropertyName(replacementTag) {
+
     if (replacementTag.indexOf('.') < 0) {
         return null;
     } else {
+
         return replacementTag.split('.')[0].replace('{{', '');
     }
 }
@@ -907,7 +899,7 @@ function replaceTags(message, payload, replacementTags, index) {
             var data = payload[propName][propValue];
 
             message = message.replace(replacementTags[item], data);
-        } else if (replacementTags[item].indexOf('.') < 0) {
+        } else {
             var data = payload[replacementTags[item].replace('{{', '').replace('}}', '')];
             message = message.replace(replacementTags[item], data);
         }

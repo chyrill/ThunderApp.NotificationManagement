@@ -61,7 +61,7 @@ module.exports =
 /******/ 	__webpack_require__.p = "";
 /******/
 /******/ 	// Load entry module and return exports
-/******/ 	return __webpack_require__(__webpack_require__.s = 14);
+/******/ 	return __webpack_require__(__webpack_require__.s = 15);
 /******/ })
 /************************************************************************/
 /******/ ([
@@ -253,7 +253,7 @@ Object.defineProperty(exports, "__esModule", {
 });
 exports.Authorization = Authorization;
 
-var _axios = __webpack_require__(13);
+var _axios = __webpack_require__(14);
 
 var _axios2 = _interopRequireDefault(_axios);
 
@@ -551,10 +551,16 @@ exports.default = _mongoose2.default.model('Queue', QueueSchema);
 /* 13 */
 /***/ (function(module, exports) {
 
-module.exports = require("axios");
+module.exports = require("unescape");
 
 /***/ }),
 /* 14 */
+/***/ (function(module, exports) {
+
+module.exports = require("axios");
+
+/***/ }),
+/* 15 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -568,21 +574,21 @@ var _constants = __webpack_require__(11);
 
 var _constants2 = _interopRequireDefault(_constants);
 
-__webpack_require__(15);
+__webpack_require__(16);
 
-var _middlewares = __webpack_require__(16);
+var _middlewares = __webpack_require__(17);
 
 var _middlewares2 = _interopRequireDefault(_middlewares);
 
-var _processorService = __webpack_require__(21);
+var _processorService = __webpack_require__(22);
 
 var _processorService2 = _interopRequireDefault(_processorService);
 
-var _senderService = __webpack_require__(22);
+var _senderService = __webpack_require__(25);
 
 var _senderService2 = _interopRequireDefault(_senderService);
 
-var _modules = __webpack_require__(25);
+var _modules = __webpack_require__(28);
 
 var _modules2 = _interopRequireDefault(_modules);
 
@@ -611,7 +617,7 @@ app.listen(_constants2.default.PORT, err => {
 });
 
 /***/ }),
-/* 15 */
+/* 16 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -640,7 +646,7 @@ _mongoose2.default.connection.once('open', () => console.log('MongoDB running'))
 });
 
 /***/ }),
-/* 16 */
+/* 17 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -650,19 +656,19 @@ Object.defineProperty(exports, "__esModule", {
   value: true
 });
 
-var _morgan = __webpack_require__(17);
+var _morgan = __webpack_require__(18);
 
 var _morgan2 = _interopRequireDefault(_morgan);
 
-var _bodyParser = __webpack_require__(18);
+var _bodyParser = __webpack_require__(19);
 
 var _bodyParser2 = _interopRequireDefault(_bodyParser);
 
-var _compression = __webpack_require__(19);
+var _compression = __webpack_require__(20);
 
 var _compression2 = _interopRequireDefault(_compression);
 
-var _helmet = __webpack_require__(20);
+var _helmet = __webpack_require__(21);
 
 var _helmet2 = _interopRequireDefault(_helmet);
 
@@ -685,31 +691,31 @@ exports.default = app => {
 };
 
 /***/ }),
-/* 17 */
+/* 18 */
 /***/ (function(module, exports) {
 
 module.exports = require("morgan");
 
 /***/ }),
-/* 18 */
+/* 19 */
 /***/ (function(module, exports) {
 
 module.exports = require("body-parser");
 
 /***/ }),
-/* 19 */
+/* 20 */
 /***/ (function(module, exports) {
 
 module.exports = require("compression");
 
 /***/ }),
-/* 20 */
+/* 21 */
 /***/ (function(module, exports) {
 
 module.exports = require("helmet");
 
 /***/ }),
-/* 21 */
+/* 22 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -740,15 +746,15 @@ var _queue = __webpack_require__(12);
 
 var _queue2 = _interopRequireDefault(_queue);
 
-var _fs = __webpack_require__(34);
+var _fs = __webpack_require__(23);
 
 var _fs2 = _interopRequireDefault(_fs);
 
-var _createHtml = __webpack_require__(35);
+var _createHtml = __webpack_require__(24);
 
 var _createHtml2 = _interopRequireDefault(_createHtml);
 
-var _unescape = __webpack_require__(36);
+var _unescape = __webpack_require__(13);
 
 var _unescape2 = _interopRequireDefault(_unescape);
 
@@ -924,7 +930,19 @@ function parseMessage(message, payload) {
 }
 
 /***/ }),
-/* 22 */
+/* 23 */
+/***/ (function(module, exports) {
+
+module.exports = require("fs");
+
+/***/ }),
+/* 24 */
+/***/ (function(module, exports) {
+
+module.exports = require("create-html");
+
+/***/ }),
+/* 25 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -951,15 +969,15 @@ var _queue = __webpack_require__(12);
 
 var _queue2 = _interopRequireDefault(_queue);
 
-var _nodemailerSmtpTransport = __webpack_require__(23);
+var _nodemailerSmtpTransport = __webpack_require__(26);
 
 var _nodemailerSmtpTransport2 = _interopRequireDefault(_nodemailerSmtpTransport);
 
-var _emailjs = __webpack_require__(24);
+var _emailjs = __webpack_require__(27);
 
 var _emailjs2 = _interopRequireDefault(_emailjs);
 
-var _unescape = __webpack_require__(36);
+var _unescape = __webpack_require__(13);
 
 var _unescape2 = _interopRequireDefault(_unescape);
 
@@ -1036,19 +1054,19 @@ async function Process() {
 }
 
 /***/ }),
-/* 23 */
+/* 26 */
 /***/ (function(module, exports) {
 
 module.exports = require("nodemailer-smtp-transport");
 
 /***/ }),
-/* 24 */
+/* 27 */
 /***/ (function(module, exports) {
 
 module.exports = require("emailjs");
 
 /***/ }),
-/* 25 */
+/* 28 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -1058,19 +1076,19 @@ Object.defineProperty(exports, "__esModule", {
     value: true
 });
 
-var _messagetemplate = __webpack_require__(26);
+var _messagetemplate = __webpack_require__(29);
 
 var _messagetemplate2 = _interopRequireDefault(_messagetemplate);
 
-var _notificationtemplate = __webpack_require__(28);
+var _notificationtemplate = __webpack_require__(31);
 
 var _notificationtemplate2 = _interopRequireDefault(_notificationtemplate);
 
-var _recipient = __webpack_require__(30);
+var _recipient = __webpack_require__(33);
 
 var _recipient2 = _interopRequireDefault(_recipient);
 
-var _notification = __webpack_require__(32);
+var _notification = __webpack_require__(35);
 
 var _notification2 = _interopRequireDefault(_notification);
 
@@ -1090,7 +1108,7 @@ exports.default = app => {
 };
 
 /***/ }),
-/* 26 */
+/* 29 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -1102,7 +1120,7 @@ Object.defineProperty(exports, "__esModule", {
 
 var _express = __webpack_require__(1);
 
-var _messagetemplate = __webpack_require__(27);
+var _messagetemplate = __webpack_require__(30);
 
 var MessageTemplateController = _interopRequireWildcard(_messagetemplate);
 
@@ -1120,7 +1138,7 @@ routes.put('', MessageTemplateController.update);
 exports.default = routes;
 
 /***/ }),
-/* 27 */
+/* 30 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -1417,7 +1435,7 @@ async function ifMessageTemplateUsed(id) {
 }
 
 /***/ }),
-/* 28 */
+/* 31 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -1429,7 +1447,7 @@ Object.defineProperty(exports, "__esModule", {
 
 var _express = __webpack_require__(1);
 
-var _notificationtemplate = __webpack_require__(29);
+var _notificationtemplate = __webpack_require__(32);
 
 var NotificationTemplateController = _interopRequireWildcard(_notificationtemplate);
 
@@ -1447,7 +1465,7 @@ routes.delete('/:id', NotificationTemplateController.remove);
 exports.default = routes;
 
 /***/ }),
-/* 29 */
+/* 32 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -1753,7 +1771,7 @@ async function ifMessageTemplateExisted(id) {
 }
 
 /***/ }),
-/* 30 */
+/* 33 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -1765,7 +1783,7 @@ Object.defineProperty(exports, "__esModule", {
 
 var _express = __webpack_require__(1);
 
-var _recipient = __webpack_require__(31);
+var _recipient = __webpack_require__(34);
 
 var RecipientController = _interopRequireWildcard(_recipient);
 
@@ -1783,7 +1801,7 @@ routes.get('', RecipientController.search);
 exports.default = routes;
 
 /***/ }),
-/* 31 */
+/* 34 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -1815,7 +1833,7 @@ var _SearchResult2 = _interopRequireDefault(_SearchResult);
 
 var _QueryFilters = __webpack_require__(8);
 
-var _axios = __webpack_require__(13);
+var _axios = __webpack_require__(14);
 
 var _axios2 = _interopRequireDefault(_axios);
 
@@ -2043,7 +2061,7 @@ async function search(req, res) {
 }
 
 /***/ }),
-/* 32 */
+/* 35 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -2055,7 +2073,7 @@ Object.defineProperty(exports, "__esModule", {
 
 var _express = __webpack_require__(1);
 
-var _notification = __webpack_require__(33);
+var _notification = __webpack_require__(36);
 
 var NotificationController = _interopRequireWildcard(_notification);
 
@@ -2070,7 +2088,7 @@ routes.post('/sendPairMessage', NotificationController.sendPairMessage);
 exports.default = routes;
 
 /***/ }),
-/* 33 */
+/* 36 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -2357,236 +2375,6 @@ async function checkIfValidNotificationTemplate(id) {
         return result;
     }
 }
-
-/***/ }),
-/* 34 */
-/***/ (function(module, exports) {
-
-module.exports = require("fs");
-
-/***/ }),
-/* 35 */
-/***/ (function(module, exports) {
-
-function buildStylesheets (sheets, async) {
-  var output = ''
-  if (!sheets) return output
-
-  if (typeof sheets === 'string') {
-    sheets = [sheets]
-  }
-
-  sheets.forEach(function (sheet) {
-    output += !async
-      ? `<link rel="stylesheet" href="${sheet}">\n`
-      : `<link rel="stylesheet" href="${sheet}" media="none" onload="if(media!=='all')media='all'">\n`
-  })
-
-  return output
-}
-
-function buildScripts (scripts, async) {
-  var output = ''
-  if (!scripts) return output
-
-  if (typeof scripts === 'string') {
-    scripts = [scripts]
-  }
-
-  scripts.forEach(function (script) {
-    output += !async
-      ? `<script src="${script}"></script>\n`
-      : `<script src="${script}" async></script>\n`
-  })
-
-  return output
-}
-
-module.exports = function (opts) {
-  var title = opts.title ? `<title>${opts.title}</title>` : ''
-  var headScript = (opts.script && opts.scriptAsync) ? buildScripts(opts.script, opts.scriptAsync) : ''
-  var bodyScript = (opts.script && !opts.scriptAsync) ? buildScripts(opts.script, opts.scriptAsync) : ''
-  var favicon = opts.favicon ? `<link rel="icon" href="${opts.favicon}">` : ''
-  var css = buildStylesheets(opts.css, opts.cssAsync)
-  var lang = opts.lang || 'en'
-  var dir = opts.dir || 'ltr'
-  var head = opts.head || ''
-  var body = opts.body || ''
-
-  return `<!doctype html>
-<html lang="${lang}" dir="${dir}">
-<head>
-${title}
-<meta charset="utf-8">
-${favicon}
-${head}
-${css}
-${headScript}
-</head>
-<body>
-${body}
-${bodyScript}
-</body>
-</html>
-`
-}
-
-
-/***/ }),
-/* 36 */
-/***/ (function(module, exports, __webpack_require__) {
-
-"use strict";
-
-
-var extend = __webpack_require__(37);
-var regexCache = {};
-var all;
-
-var charSets = {
-  default: {
-    '&quot;': '"',
-    '&#34;': '"',
-
-    '&apos;': '\'',
-    '&#39;': '\'',
-
-    '&amp;': '&',
-    '&#38;': '&',
-
-    '&gt;': '>',
-    '&#62;': '>',
-
-    '&lt;': '<',
-    '&#60;': '<'
-  },
-  extras: {
-    '&cent;': '¢',
-    '&#162;': '¢',
-
-    '&copy;': '©',
-    '&#169;': '©',
-
-    '&euro;': '€',
-    '&#8364;': '€',
-
-    '&pound;': '£',
-    '&#163;': '£',
-
-    '&reg;': '®',
-    '&#174;': '®',
-
-    '&yen;': '¥',
-    '&#165;': '¥'
-  }
-};
-
-// don't merge char sets unless "all" is explicitly called
-Object.defineProperty(charSets, 'all', {
-  get: function() {
-    return all || (all = extend({}, charSets.default, charSets.extras));
-  }
-});
-
-/**
- * Convert HTML entities to HTML characters.
- *
- * @param  {String} `str` String with HTML entities to un-escape.
- * @return {String}
- */
-
-function unescape(str, type) {
-  if (!isString(str)) return '';
-  var chars = charSets[type || 'default'];
-  var regex = toRegex(type, chars);
-  return str.replace(regex, function(m) {
-    return chars[m];
-  });
-}
-
-function toRegex(type, chars) {
-  if (regexCache[type]) {
-    return regexCache[type];
-  }
-  var keys = Object.keys(chars).join('|');
-  var regex = new RegExp('(?=(' + keys + '))\\1', 'g');
-  regexCache[type] = regex;
-  return regex;
-}
-
-/**
- * Returns true if str is a non-empty string
- */
-
-function isString(str) {
-  return str && typeof str === 'string';
-}
-
-/**
- * Expose charSets
- */
-
-unescape.chars = charSets.default;
-unescape.extras = charSets.extras;
-// don't trip the "charSets" getter unless it's explicitly called
-Object.defineProperty(unescape, 'all', {
-  get: function() {
-    return charSets.all;
-  }
-});
-
-/**
- * Expose `unescape`
- */
-
-module.exports = unescape;
-
-
-/***/ }),
-/* 37 */
-/***/ (function(module, exports, __webpack_require__) {
-
-"use strict";
-
-
-var isObject = __webpack_require__(38);
-
-module.exports = function extend(o/*, objects*/) {
-  if (!isObject(o)) { o = {}; }
-
-  var len = arguments.length;
-  for (var i = 1; i < len; i++) {
-    var obj = arguments[i];
-
-    if (isObject(obj)) {
-      assign(o, obj);
-    }
-  }
-  return o;
-};
-
-function assign(a, b) {
-  for (var key in b) {
-    if (hasOwn(b, key)) {
-      a[key] = b[key];
-    }
-  }
-}
-
-/**
- * Returns true if the given `key` is an own property of `obj`.
- */
-
-function hasOwn(obj, key) {
-  return Object.prototype.hasOwnProperty.call(obj, key);
-}
-
-
-/***/ }),
-/* 38 */
-/***/ (function(module, exports) {
-
-module.exports = require("is-extendable");
 
 /***/ })
 /******/ ]);
